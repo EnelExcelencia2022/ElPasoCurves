@@ -204,7 +204,7 @@ class DegradaApp:
 
         #self.df_pot.to_pickle('./dataset/data_potencia.pkl')
         #self.df_wind.to_pickle('./dataset/data_viento.pkl')
-
+        self.df_pot = self.PotenciaTrafo(self.df_pot)
         self.pot_arr = self.df_pot.to_numpy()
         self.wind_arr = self.df_wind.to_numpy()
         self.mes_idx = -2
@@ -220,6 +220,16 @@ class DegradaApp:
         one_array = pd.to_numeric(one_array, errors='coerce')
         df = pd.DataFrame(one_array.reshape(orig_shape[0], orig_shape[1]), index=df.index.tz_localize(None), columns=df.columns)
         return df
+
+    def PotenciaTrafo(self, df):
+        columnas_inv = df.columns
+        pot_trafo_arr = np.zeros((len(columnas_inv), df.shape[0]))
+        for i in range(len(columnas_inv)//2):
+            j = i*2
+            pot_trafo_arr[i] = df.loc[:,columnas_inv[j]] + df.loc[:,columnas_inv[j+1]]
+
+        df_pot_new = pd.DataFrame(pot_trafo_arr)
+        return df_pot_new
 
     #TRANSFORMA DATOS NEGATIVOS A CERO PARA MEJORAR LAS GRAFICAS
     def EliminaErrores(self, serie1):
@@ -673,7 +683,7 @@ class DegradaApp:
         axs.text(x=0, y=800, s=f''' S1: ({round(point_2[0],2)},  {round(point_2[1],2)})\n S2: ({round(point_1[0],2)},  {round(point_1[1],2)})''',
                 fontsize=9)
 
-        axs.set_ylim([0,1300])
+        axs.set_ylim([0,1500])
         axs.set_xlim([0,1300])
         axs.set_xticks(range(0,1300,200))
         axs.set_yticks(range(0,1300,200))
@@ -914,9 +924,11 @@ class DegradaApp:
     def setupUi(self, MainWindow):
         self.mainwindow = MainWindow
         self.ui_obj.setupUi(MainWindow)
-        fecha_min = self.df_pot.index.min().strftime('%d/%m/%Y')
-        fecha_max = self.df_pot.index.max().strftime('%d/%m/%Y')
-        self.ui_obj.lbl_actual.setText(f'Datos actualizados desde {fecha_min} al {fecha_max}')
+        self.config_file['PLANTA']['nombre']
+        #MainWindow.setWindowTitle(_translate("MainWindow", f"{self.config_file['PLANTA']['nombre']} - curvas"))
+        #fecha_min = self.df_pot.index.min().strftime('%d/%m/%Y')
+        #fecha_max = self.df_pot.index.max().strftime('%d/%m/%Y')
+        self.ui_obj.lbl_actual.setText(f'Datos actualizados desde 01/2021 al 01/2023')
 
         self.ui_obj.comboBox_ANNO_I.addItems([str(x) for x in self.YEAR_LIST])
         self.ui_obj.comboBox_ANNO_I.setCurrentIndex(np.where(self.YEAR_LIST == self.ANNO_I)[0][0])

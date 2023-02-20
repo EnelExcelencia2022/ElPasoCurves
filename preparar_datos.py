@@ -9,13 +9,13 @@ def TransformaDF(df_original):
     df = pd.DataFrame(one_array.reshape(orig_shape[0], orig_shape[1]), index=df.index, columns=df.columns)
     return df
 
-df = pd.read_excel(f'dataset/espza_fase3.xlsx', index_col=0, parse_dates=True)
+df = pd.read_excel(f'dataset/irradiancia_paso.xlsx', index_col=0, parse_dates=True)
 print(df.head())
 df = TransformaDF(df)
 df['Mes'] = df.index.to_series().apply(lambda x: x.month)
 df['Anno'] = df.index.to_series().apply(lambda x: x.year)
 
-df.to_pickle('./dataset/espza_fase3.pk')
+df.to_pickle('./dataset/irradiancia_paso.pk')
 
 
 # dfp = pd.read_csv('./dataset/potencia_rubi.csv', index_col=0, parse_dates=True)
